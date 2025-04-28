@@ -1,0 +1,89 @@
+{% extends 'hello.html' %}
+{% block content %}
+<body>
+  <div class="grid grid-cols-2 gap-4">
+
+    <!-- Monthly Expense Trend -->
+    <div class="border-2 rounded-xl p-4">
+      <h3 class="text-xl font-semibold mb-2">Monthly Expense Trend</h3>
+      <canvas id="monthlyExpenseChart" width="400" height="200" class="mb-8"></canvas>
+    </div>
+
+    <!-- Monthly Category Expenses Pie -->
+    <div class="border-2 rounded-xl p-4">
+      <h3 class="text-xl font-semibold mb-2">Monthly Category Expenses</h3>
+      <canvas id="categoryExpensePieChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- Recent Expenses -->
+    <div class="border-2 col-span-2 p-4 rounded-xl">
+      <h3 class="text-2xl font-semibold mb-4">Recent Expenses</h3>
+      <ul class="mb-6 space-y-2">
+        {% if recent_expenses %}
+          {% for expense in recent_expenses %}
+            <li>
+              <div class="flex justify-between items-center p-3 bg-secondary/50 rounded-lg bg-puerple-100 shadow-md">
+                <div>
+                  <div class="font-medium">{{ expense.category }}</div>
+                  <div class="text-sm text-gray-600">{{ expense.date }}</div>
+                </div>
+                <div class="font-semibold">₹{{ expense.amount }}</div>
+              </div>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li>No expenses found.</li>
+        {% endif %}
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Chart.js Scripts -->
+  <script>
+    const monthlyExpenseCtx = document.getElementById('monthlyExpenseChart').getContext('2d');
+    const monthlyExpenseChart = new Chart(monthlyExpenseCtx, {
+      type: 'line',
+      data: {
+        labels: {{ monthly_labels|safe }},
+        datasets: [{
+          label: 'Monthly Expenses',
+          data: {{ monthly_totals|safe }},
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 2,
+          fill: false
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    const categoryExpensePieCtx = document.getElementById('categoryExpensePieChart').getContext('2d');
+    const categoryExpensePieChart = new Chart(categoryExpensePieCtx, {
+      type: 'pie',
+      data: {
+        labels: {{ category_labels|safe }},
+        datasets: [{
+          data: {{ category_totals|safe }},
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {}
+    });
+  </script>
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'hello.html' %}
+{% block content %}
+  <h2>Add New Category</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add Category</button>
+  </form>
+  <p><a href="{% url 'tracker:set_budget' %}">Back to Set Budget</a></p>
+  <p><a href="{% url 'tracker:dashboard' %}">Back to Dashboard</a></p>
+{% endblock %}

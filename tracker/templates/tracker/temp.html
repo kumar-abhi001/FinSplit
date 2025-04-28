@@ -1,0 +1,131 @@
+{% extends 'hello.html' %}
+{% block content %}
+    <h2>Dashboard</h2>
+
+    <h3>Recent Expenses</h3>
+    {% if recent_expenses %}
+        <ul>
+            {% for expense in recent_expenses %}
+                <li>{{ expense.date }} - {{ expense.category }} - {{ expense.amount }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No recent expenses.</p>
+    {% endif %}
+
+    <h3>Budget Overview</h3>
+    {% if budget_items %}
+        <ul>
+            {% for budget in budget_items %}
+                <li>{{ budget.category }}: Limit - {{ budget.limit }}
+                    {% for cat_expense in category_expenses %}
+                        {% if cat_expense.category__name == budget.category.name %}
+                            (Spent: {{ cat_expense.total }})
+                            {% if cat_expense.total > budget.limit %}
+                                <span style="color: red;">Over Budget!</span>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No budgets set. <a href="{% url 'tracker:set_budget' %}">Set Budget Now</a></p>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Monthly Expense Trend</h3>
+            <canvas id="monthlyExpenseChart" width="400" height="200"></canvas>
+
+            <h3>Monthly Category Expenses</h3>
+            <canvas id="categoryExpensePieChart" width="400" height="200"></canvas>
+        </div>
+        <div class="col-md-4">
+            <div class="sidebar">
+                <h3>Financial Advice Powered by Gemini AI</h3>
+                <div id="financial-advice-container">
+                    <p>{{ gemini_analysis|linebreaksbr }}</p>
+                </div>
+                <p><a href="{% url 'tracker:set_budget' %}">Set/Edit Budget</a></p>
+                <p><a href="{% url 'tracker:add_category' %}">Add Category</a></p>
+            </div>
+        </div>
+    </div>
+
+    <p><a href="{% url 'tracker:add_expense' %}">Add New Expense</a></p>
+
+    <style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .sidebar {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+
+    <script>
+        const monthlyExpenseCtx = document.getElementById('monthlyExpenseChart').getContext('2d');
+        const monthlyExpenseChart = new Chart(monthlyExpenseCtx, {
+            type: 'line',
+            data: {
+                labels: {{ monthly_labels|safe }},
+                datasets: [{
+                    label: 'Monthly Expenses',
+                    data: {{ monthly_totals|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const categoryExpensePieCtx = document.getElementById('categoryExpensePieChart').getContext('2d');
+        const categoryExpensePieChart = new Chart(categoryExpensePieCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ category_labels|safe }},
+                datasets: [{
+                    data: {{ category_totals|safe }},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                        // Add more colors as needed
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                // Add options if needed
+            }
+        });
+    </script>
+{% endblock %}

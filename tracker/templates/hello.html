@@ -1,0 +1,228 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+  <title>Expense Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div> 
+  <nav style="background-color: #044069;" id="navibar">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="{% url 'home' %}" class="flex items-center">
+      <div  style="font-size: 32px;" class="font-bold text-white">FinSplit</div>
+    </a>
+
+    <button class="text-white lg:hidden focus:outline-none" id="navbarToggle">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+    <div class="hidden w-full lg:flex lg:items-center lg:w-auto" id="navbarMenu">
+      <ul class="flex flex-col lg:flex-row lg:space-x-6 mt-4 lg:mt-0">
+        <!-- You can add any main navigation links here if needed -->
+      </ul>
+
+      <ul class="flex items-center space-x-4 ml-auto">
+        {% block notification %}{% endblock notification %}
+
+        {% if request.user.is_authenticated %}
+          <span class="text-white hidden md:inline-block">Hi, {{ request.user.username }} <i class="fa-solid fa-face-smile"></i></span>
+
+          <li class="relative group">
+            <button class="flex items-center text-white focus:outline-none">
+              <i class="fa fa-user"></i>
+              <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M5.293 7.707a1 1 0 011.414 0L10 11.586l3.293-3.879a1 1 0 111.414 1.414l-4 4.5a1 1 0 01-1.414 0l-4-4.5a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
+              </svg>
+            </button>
+            <ul
+              class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg hidden group-hover:block">
+              <li><a href="{% url 'logout_handler' %}" class="block px-4 py-2 hover:bg-gray-100">
+                  Log Out <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li>
+            <button type="button" class="text-white border border-white px-4 py-2 rounded hover:bg-white hover:text-gray-900 mx-2" data-bs-toggle="modal" data-bs-target="#login_modal">
+              Log In
+            </button>
+            <button type="button" class="text-white border border-white px-4 py-2 rounded hover:bg-white hover:text-gray-900 mx-2" data-bs-toggle="modal" data-bs-target="#signup_modal">
+              Join Us!
+            </button>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+  </div>
+  <div class="grid grid-cols-4 mx-20 mt-4 gap-4">
+    
+    <!-- Navbar -->
+    <div class="col-span-3">
+      <nav style="background-color: #6d28d9; text:white; font-weight: 800;"   class=" p-[4px] text-black  rounded-xl h-auto">
+        <div class="flex justify-evenly items-center" style="font-weight: 800;">
+          
+          <button style="font-weight: 700; text:white;" class="rounded-xl px-4 py-2 text-white  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <a href="{% url 'tracker:dashboard' %}" class="block w-full">Dashboard</a>
+          </button>
+
+          <button style="font-weight: 700;" class="rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <a href="{% url 'tracker:expenses' %}" class="block w-full ">Expenses</a>
+          </button>
+
+          <button style="font-weight: 700; color:white;" class="rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <a href="{% url 'tracker:set_budget' %}" class="block w-full">Budget</a>
+          </button>
+
+          <button style="font-weight: 700; color:white;" class="rounded-xl px-4 py-2  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <a href="#" onclick="showComingSoon()" class="block w-full">Reports</a>
+          </button>
+
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="col-span-3 container mx-auto py-8">
+        {% block content %}
+        {% endblock %}
+      </div>
+
+    </div>
+
+    <!-- Hero Section -->
+    <div class="border-2 rounded-xl">
+      <div class="col-span-1 bg-purple-700 p-8 rounded-lg shadow-lg backdrop-blur-sm border border-white/20">
+        <div class="text-2xl font-bold text-white">
+          Gemini Financial Assistant
+        </div>
+        <div class="text-lg mt-2 text-gray-300">
+          AI-powered insights to improve your financial health
+        </div>
+      </div>
+      
+      <div class="flex flex-col p-8" id="adivceSection">
+        <div class="mb-5 text-center font-medium text-gray-600">
+          Get personalized financial advice powered by Gemini AI
+        </div>
+        <button id="getAiInsightsBtn" class="bg-purple-500 hover:bg-purple-700 text-white border-2 px-10 rounded-xl py-3 focus:outline-none focus:shadow-outline">
+                    Get AI Insights
+                </button>
+      </div>
+
+      <div id="aiInsightsContainer" class="mt-4 text-gray-700 hidden">
+                    <h4 class="font-semibold mb-2"></h4>
+                    <ul id="aiInsightsList" class="list-disc pl-5">
+                        <li></li>
+                    </ul>
+                    <h4 class="font-semibold mt-4 mb-2 ml-2">Financial Advice:</h4>
+                    <p id="financialAdvice" class="text-gray-700">Fetching financial advice...</p>
+                </div>
+    </div>
+
+  </div>
+
+  <script>
+  function showComingSoon() {
+    alert("Coming Soon!");
+  }
+
+const getAiInsightsBtn = document.getElementById('getAiInsightsBtn');
+const aiInsightsContainer = document.getElementById('aiInsightsContainer');
+const aiInsightsList = document.getElementById('aiInsightsList');
+const financialAdvice = document.getElementById('financialAdvice');
+
+getAiInsightsBtn.addEventListener('click', () => {
+    aiInsightsContainer.classList.remove('hidden');
+    financialAdvice.textContent = 'Fetching financial advice...';
+
+    fetch('{% url "tracker:get_ai_insights" %}')
+        .then(response => response.json())
+        .then(data => {
+            console.log('AI Insights:', data);
+            aiInsightsList.innerHTML = ''; // Clear loading message
+
+            // Handling insights
+            if (data.insights && Array.isArray(data.insights) && data.insights.length > 0) {
+             let insights = data.insights;
+
+    if (typeof insights === 'string') {
+        // Clean the ```json\n ... ``` wrapper if it exists
+        insights = insights.replace(/^```(?:json)?\n([\s\S]*?)\n```$/, '$1');
+        insights = JSON.parse(insights);
+    }
+    insights.forEach(insight => {
+        console.log('Insight:', insight);
+
+        const li = document.createElement('li');
+        li.classList.add('p-2', 'border', 'mb-2', 'rounded', 'bg-gray-50');
+
+        li.innerHTML = `
+            <strong>${insight.title}</strong><br>
+            <span class="text-gray-600">${insight.content}</span>
+        `;
+
+        {% comment %} aiInsightsList.appendChild(li); {% endcomment %}
+    });
+            } else {
+                aiInsightsList.innerHTML = '<li class="text-gray-500">No specific insights found.</li>';
+            }
+
+            financialAdvice.textContent = ''; // Clear loading message
+
+            // Handling advice (parsing the JSON string)
+            if (data.advice) {
+                try {
+                    // Removing the ```json\n and ``` part before parsing
+                    const adviceJsonString = data.advice.replace(/```(?:json)?\n([\s\S]*?)```/, '$1');
+                    const adviceArray = JSON.parse(adviceJsonString);
+                    console.log('Parsed advice:', adviceArray);
+
+                    // Rendering advice
+                    if (Array.isArray(adviceArray) && adviceArray.length > 0) {
+                        adviceArray.forEach(item => {
+                          console.log('Advice item:', item);
+                            const p = document.createElement('p');
+                            p.classList.add('p-3', 'bg-gray-200', 'rounded', 'mb-2');
+                            p.innerHTML = `<strong>${item.title}</strong><br>
+            <span class="text-gray-600">${item.content}</span>`;
+                            financialAdvice.appendChild(p);
+                        });
+                    } else {
+                        financialAdvice.textContent = 'No financial advice available.';
+                    }
+                } catch (e) {
+                    console.error('Error parsing advice:', e);
+                    financialAdvice.textContent = 'Error displaying financial advice.';
+                }
+            } else {
+                financialAdvice.textContent = 'No financial advice available.';
+            }
+
+        })
+        .catch(error => {
+            console.error('Error fetching AI insights:', error);
+            aiInsightsList.innerHTML = '<li class="text-red-500">Error fetching AI insights.</li>';
+            financialAdvice.textContent = 'Error fetching financial advice.';
+            aiInsightsContainer.classList.remove('hidden');
+        });
+});
+
+document.getElementById('navbarToggle').addEventListener('click', function () {
+    const menu = document.getElementById('navbarMenu');
+    menu.classList.toggle('hidden');
+  });
+</script>
+</body>
+</html>

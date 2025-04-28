@@ -1,0 +1,70 @@
+{% extends 'hello.html' %}
+{% block content %}
+    <div class="container mx-auto py-8">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="flex items-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 mr-2 text-indigo-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 4v-2m3 2v-2m2 4h-10v-4m2 4h6m-6-4l-3-1m3 1l3-1m-3-1l-3 1m3-1l3 1" />
+                </svg>
+                <h2 class="text-xl font-semibold">Budget Planning</h2>
+            </div>
+            <p class="text-gray-600 mb-4">Set and manage your monthly budget categories</p>
+
+            <div class="bg-indigo-50 rounded-lg p-6 mb-6 border-2 border-dotted text-center border-indigo-200">
+                <h3 class="text-lg font-semibold text-indigo-700 mb-2">AI Budget Planning</h3>
+                <p class="text-gray-600 mb-4">Our AI can analyze your spending patterns and suggest optimal budget allocations.</p>
+                <button id="generateSmartBudgetBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Generate Smart Budget
+                </button>
+                <div id="smartBudgetSuggestions" class="mt-4 text-gray-700 hidden">
+                    <h4 class="font-semibold mb-2">Suggested Budget:</h4>
+                    <ul class="list-disc pl-5 list-none">
+                        <li id="suggestionPlaceholder" class="list-none">Analyzing your spending...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const generateSmartBudgetBtn = document.getElementById('generateSmartBudgetBtn');
+        const smartBudgetSuggestions = document.getElementById('smartBudgetSuggestions');
+        const suggestionPlaceholder = document.getElementById('suggestionPlaceholder');
+
+        generateSmartBudgetBtn.addEventListener('click', () => {
+            smartBudgetSuggestions.classList.remove('hidden');
+            suggestionPlaceholder.textContent = 'Analyzing your spending...'; // Initial message
+
+            fetch('{% url "tracker:generate_smart_budget" %}')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                  console.log("data", data);
+                    suggestionPlaceholder.textContent = ''; // Clear the loading message
+                    if (data.suggestions && Object.keys(data.suggestions).length > 0) {
+                        const ul = document.createElement('ul');
+                        ul.classList.add('list-none', 'pl-5');
+                        for (const category in data.suggestions) {
+                            const li = document.createElement('li');
+                            li.textContent = `${category}: ₹${data.suggestions[category].toFixed(2)}`;
+                            ul.appendChild(li);
+                        }
+                        smartBudgetSuggestions.querySelector('ul').replaceWith(ul);
+                    } else if (data.error) {
+                        suggestionPlaceholder.textContent = `Error: ${data.error}`;
+                    } else {
+                        suggestionPlaceholder.textContent = 'No budget suggestions could be generated at this time.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching smart budget:', error);
+                    suggestionPlaceholder.textContent = 'Error fetching budget suggestions.';
+                    smartBudgetSuggestions.classList.remove('hidden');
+                });
+        });
+    </script>
+{% endblock %}

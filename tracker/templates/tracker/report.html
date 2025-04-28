@@ -1,0 +1,27 @@
+{% extends 'hello.html' %}
+{% block content %}
+    <h2>{{ report_type }} Report</h2>
+
+    <h3>Data:</h3>
+    <ul>
+        {% for item in report_data %}
+            <li>
+                {% if report_type == 'Monthly' %}
+                    {{ item.month|date:"F Y" }}: Total - {{ item.total }}
+                {% elif report_type == 'Annual' %}
+                    {{ item.year|date:"Y" }}: Total - {{ item.total }}
+                {% elif report_type == 'Category' %}
+                    {{ item.category__name }}: Total - {{ item.total }}
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No data available for this report.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Analysis by Gemini AI:</h3>
+    <p>{{ report_analysis|linebreaksbr }}</p>
+
+    <button onclick="window.print()">Download as PDF</button>
+    <p><a href="{% url 'tracker:dashboard' %}">Back to Dashboard</a></p>
+{% endblock %}

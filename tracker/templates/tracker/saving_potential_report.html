@@ -1,0 +1,13 @@
+{% extends 'hello.html' %}
+{% block content %}
+    <h2>{{ report_type }} Report</h2>
+
+    <h3>Saving Potential:</h3>
+    <p>Based on your estimated monthly income and recent spending, your potential savings are: <strong>{{ saving_potential }}</strong></p>
+
+    <h3>Analysis and Improvement Tips by Gemini AI:</h3>
+    <p>{{ report_analysis|linebreaksbr }}</p>
+
+    <button onclick="window.print()">Download as PDF</button>
+    <p><a href="{% url 'tracker:dashboard' %}">Back to Dashboard</a></p>
+{% endblock %}

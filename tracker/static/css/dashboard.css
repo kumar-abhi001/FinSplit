@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    position: relative;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #888;
+}
+
+
+.main-content {
+  display: flex; /* Enable flexbox for horizontal layout */
+  justify-content: space-between; /* Distribute space between items */
+}
+
+.main-content > * { /* Target direct children of .main-content */
+  margin-left: 70px; /* Add 70px space to the left of each item */
+}
+
+.main-content > *:first-child { /* Reset left margin for the first item */
+  margin-left: 0;
+}
+
+.tabs {
+    flex: 3;
+}
+
+.tab-list {
+    display: flex;
+    gap: 130px;
+    margin-bottom: 20px;
+    list-style: none;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    background-color: #f1f5f9;
+    border-radius: 8px;
+    width: fit-content;
+    padding: 0 50px;
+    color: #6c7f96;
+    font-weight: 550;
+}
+
+.tab-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.tab-item.active {
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    transform: scale(1.05);
+    padding: 5px 20px;
+}
+.tab-pane {
+    display: flex;
+    justify-content: space-between;
+    /* To ensure even spacing */
+    gap: 20px;
+    /* Space between cards */
+}
+
+.card {
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+    margin-bottom: 20px;
+}
+
+.recent-expenses {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.recent-expenses li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.view-all-btn,
+.add-expense-btn,
+.generate-budget-btn,
+.report-btn {
+    padding: 10px 20px;
+    background-color: #4c7dff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-all-btn:hover,
+.add-expense-btn:hover,
+.generate-budget-btn:hover,
+.report-btn:hover {
+    background-color: #375bbd;
+}
+
+.insights {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    cursor: pointer;
+}
+
